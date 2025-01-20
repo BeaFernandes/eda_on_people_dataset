@@ -1,0 +1,154 @@
+---
+title: "Atividade_Avaliativa"
+output: html_document
+date: "2024-05-23"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+## Importando e entendendo os dados
+
+Leitura e etendimento dos dados e vizualização das primeiras linhas.
+```{r }
+library(readxl)
+dados_exercio <- read.csv("/home/beatriz-pessoal/Downloads/dados_exercio.csv")
+str(dados_exercio)
+head(dados_exercio)
+```
+O data set exibe alguns dados que foram coletados de pessoas, tais como gênero, idade, profissão e informações sobre qualidade do sono e atividade física.
+Através do summary já podemos observar algumas informações relevantes, por exemplo, a média de idade dos participantes da pesquisa é de 42 anos, a média de horas de sono é de 7 horas e a média de minutos de atividade física é de 59 minutos.
+
+```{r }
+summary(dados_exercio)
+```
+
+## Análise univariável
+
+### Variáveis qualitativas
+
+A leitura abaixo utiliza a variável "Gender" e através disso podemos observar que a distribuição é muito semelhante entre os gêneros, sendo que 49,5% dos participantes da pesquisa são do gênero feminino e 50,5% do gênero masculino.
+
+```{r }
+gender_percentage <- round(prop.table(table(dados_exercio$Gender)) * 100, 1)
+gender_percentage
+```
+```{r }
+barplot(gender_percentage,
+    col = c("pink", "blue"),
+    main = "Distribuição de gênero",
+    ylab = "Porcentagem (%)"
+)
+```
+
+Abaixo podemos observar a distribuição das profissões dos participantes da pesquisa, onde a profissão mais comum é a de "Nurse" com 19,5% dos participantes, seguida por "Doctor" com 19% e "Engineer" com 16,8%.
+```{r }
+occupation_percentage <- sort(round(prop.table(table(dados_exercio$Occupation)) * 100, 1), decreasing = T)
+occupation_percentage
+```
+```{r }
+barplot(occupation_percentage,
+    main = "Distribuição de profissões",
+    ylab = "Porcentagem (%)",
+    ylim = c(0, max(occupation_percentage) + 5)
+)
+```
+
+### Variáveis quantitativas
+
+#### Qualidade de sono
+A seguir observa-se a distribuição de qualidade de sono das pessoas. Nota-se que 48,1% dos participantes da pesquisa tem qualidade de sono igual a 8 ou 9.
+```{r }
+sleep_quality <- round(prop.table(table(dados_exercio$Quality.of.Sleep)) * 100, 1)
+sum(sleep_quality[c("8", "9")])
+```
+E a distribuição geral da qualidade de sono pode ser observada no grafico abaixo.
+```{r }
+barplot(sleep_quality,
+    main = "Distribuição de qualidade de sono",
+    ylab = "Porcentagem (%)",
+    ylim = c(0, max(sleep_quality) + 5)
+)
+```
+
+#### Duração de sono
+Em seguida, observa-se a distribuição de duração de sono das pessoas. Nota-se que 50% dos participantes da pesquisa tem noites de sono com duração de até 7,2 horas.
+
+```{r }
+quantile(dados_exercio$Sleep.Duration)
+```
+Dessa forma temos que a mediana é igual a 7,2 e a média é igual a 7.
+```{r }
+median(dados_exercio$Sleep.Duration)
+mean(dados_exercio$Sleep.Duration)
+```
+O boxplot nos ilustra a distribuição de horas de sono dos participantes da pesquisa, observa-se que há uma distribuição simétrica e que não há outliers. 
+```{r }
+boxplot(dados_exercio$Sleep.Duration,
+    main = "Distribuição de horas de sono",
+    ylab = "Horas de sono"
+)
+```
+
+#### Tempo de atividade física
+A seguir, observa-se a distribuição de minutos de atividade física das pessoas. Nota-se que 50% dos participantes da pesquisa tem minutos de atividade física de até 60 minutos por dia.
+
+```{r }
+quantile(dados_exercio$Physical.Activity)
+```
+
+Abaixo temos que a mediana é igual a 60 e a média é igual a 59,1, sendo as duas medidas muito próximas entre si.
+
+```{r }
+median(dados_exercio$Physical.Activity)
+mean(dados_exercio$Physical.Activity)
+```
+
+O boxplot nos ilustra a distribuição de minutos de atividade física dos participantes da pesquisa, observa-se que há uma distribuição simétrica e que não há outliers.
+
+```{r }
+boxplot(dados_exercio$Physical.Activity,
+    main = "Distribuição de minutos de atividade física",
+    ylab = "Minutos de atividade física"
+)
+```
+
+## Análise entre duas variáveis
+
+### Relações entre variáveis qualitativas
+
+#### Gênero e profissão
+
+Através da tabela abaixo, podemos observar que a profissão mais comum entre os homens é "Doctor" com 18,4% dos participantes, enquanto que entre as mulheres é "Nurse" com 19,5% dos participantes.
+
+```{r }
+addmargins(round(prop.table(table(dados_exercio$Gender, dados_exercio$Occupation)) * 100, 1))
+```
+
+### Relação entre variáveis quantitativas
+
+#### Qualidade de sono e duração de sono
+
+Através do gráfico de dispersão abaixo, podemos observar que a qualidade de sono e a duração de sono não possuem uma relação clara entre si.
+```{r }
+plot(dados_exercio$Quality.of.Sleep, dados_exercio$Sleep.Duration,
+    xlab = "Qualidade de sono",
+    ylab = "Duração de sono",
+    main = "Gráfico de dispersão de qualidade de sono por duração de sono"
+)
+```
+
+### Relação entre variáveis qualitativas com quantitativas
+
+#### Qualidade de sono por gênero
+
+Através do boxplot abaixo podemos observar que a qualidade de sono é um pouco melhor entre as mulheres do que entre os homens.
+
+```{r }
+require(ggplot2)
+
+ggplot(data = dados_exercio, aes(y = Quality.of.Sleep, x = Gender)) +
+    geom_boxplot() +
+    labs(title = "Qualidade de sono por gênero", y = "Qualidade de sono", x = "Gênero")
+```
